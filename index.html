@@ -258,13 +258,124 @@ input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
   .option{font-size:16px}
   .timer{justify-content:center}
 }
+
+.archive-panel{
+  margin-top:20px;
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:18px;
+  background:#fff;
+}
+.archive-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:14px;
+}
+.archive-tabs{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin:14px 0;
+}
+.tabbtn{
+  border:1px solid var(--border);
+  background:#fff;
+  color:#111827;
+  border-radius:999px;
+  padding:10px 13px;
+  font-weight:900;
+  cursor:pointer;
+}
+.tabbtn.active{
+  background:var(--blue);
+  color:#fff;
+  border-color:var(--blue);
+}
+.archive-grid{
+  display:grid;
+  grid-template-columns:1fr;
+  gap:16px;
+}
+.archive-table{
+  width:100%;
+  border-collapse:collapse;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  background:#fff;
+}
+.archive-table th,.archive-table td{
+  border-bottom:1px solid var(--border);
+  padding:10px;
+  text-align:left;
+  font-size:14px;
+  vertical-align:top;
+}
+.archive-table th{
+  background:#f8fafc;
+  color:#334155;
+}
+.archive-table tr.mine{background:#eff6ff}
+.smallbtn{
+  border:1px solid var(--border);
+  background:#fff;
+  color:#111827;
+  border-radius:10px;
+  padding:7px 10px;
+  font-weight:800;
+  cursor:pointer;
+  margin:2px;
+}
+.smallbtn.blue{
+  background:#2563eb;
+  border-color:#2563eb;
+  color:#fff;
+}
+.attempt-detail{
+  margin-top:16px;
+}
+.compare-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:12px;
+  margin:12px 0;
+}
+.compare-box{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px;
+  background:#f8fafc;
+}
+.err-list{
+  display:grid;
+  gap:10px;
+}
+.err-card{
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:12px;
+  background:#fff;
+}
+.err-card b{display:block;margin-bottom:6px}
+.status-wrong{color:var(--red);font-weight:900}
+.status-blank{color:#b45309;font-weight:900}
+.status-fixed{color:var(--green);font-weight:900}
+.status-repeat{color:var(--red);font-weight:900}
+.status-new{color:#b45309;font-weight:900}
+@media(max-width:900px){
+  .archive-head{flex-direction:column}
+  .archive-table{display:block;overflow-x:auto;white-space:nowrap}
+  .compare-grid{grid-template-columns:1fr}
+}
+
 </style>
 </head>
 <body>
 <header>
   <div>
     <h1>Biznes hüququ</h1>
-    <div class="sub">3 hissəli özünü yoxlama sistemi · hər hissə 100 sual · 90 dəqiqə</div>
+    <div class="sub">3 hissəli özünü yoxlama sistemi · hər hissə 100 sual · 90 dəqiqə · arxivli scoreboard</div>
   </div>
   <div class="timer"><span class="hourglass">⌛</span><span id="timer">90:00</span></div>
 </header>
@@ -286,6 +397,19 @@ input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
     </div>
 
     <div class="dashboard-grid" id="partCards"></div>
+
+    <div class="archive-panel">
+      <div class="archive-head">
+        <div>
+          <h2>Scoreboard və imtahan arxivi</h2>
+          <p class="sub">Hər hissə üzrə bütün cəhdlər saxlanılır. İstifadəçi eyni adla və ya fərqli girişlə daxil olsa belə, cəhdlər silinmir. Buradan əvvəlki səhvlərə baxmaq və cəhdləri müqayisə etmək mümkündür.</p>
+        </div>
+        <button class="btn ghost" id="refreshArchiveBtn">Arxivi yenilə</button>
+      </div>
+      <div class="archive-tabs" id="archiveTabs"></div>
+      <div id="archiveContent"></div>
+      <div id="attemptDetail" class="attempt-detail"></div>
+    </div>
   </section>
 
   <section id="examView" class="exam-layout hidden">
@@ -361,48 +485,52 @@ function fmt(seconds){
 function partQuestions(part){
   return DATA.questions.filter(q => q.id >= part.start && q.id <= part.end);
 }
-function leaderboardKey(partId){
-  return "biznes_huququ_3_part_" + partId + "_leaderboard_v1";
+function archiveKey(partId){
+  return "biznes_huququ_3_part_" + partId + "_attempt_archive_v2";
 }
-function getLB(partId){
-  try{return JSON.parse(localStorage.getItem(leaderboardKey(partId)) || "[]")}catch(e){return []}
+function getAttempts(partId){
+  try{return JSON.parse(localStorage.getItem(archiveKey(partId)) || "[]")}catch(e){return []}
 }
-function setLB(partId, rows){
-  localStorage.setItem(leaderboardKey(partId), JSON.stringify(rows));
+function setAttempts(partId, rows){
+  localStorage.setItem(archiveKey(partId), JSON.stringify(rows));
 }
-function sortLB(rows){
+function sortScore(rows){
   return [...rows].sort((a,b)=> b.correct-a.correct || a.spent-b.spent || new Date(a.date)-new Date(b.date));
 }
-function saveLB(row){
-  const partId = row.partId;
-  let rows = getLB(partId);
-  const key = (row.name+"|"+row.group).toLowerCase().trim();
-  const i = rows.findIndex(r => (r.name+"|"+r.group).toLowerCase().trim() === key);
-  if(i >= 0){
-    const old = rows[i];
-    if(row.correct > old.correct || (row.correct === old.correct && row.spent < old.spent)){
-      rows[i] = row;
-    }
-  } else {
-    rows.push(row);
-  }
-  setLB(partId, sortLB(rows));
+function sortDate(rows){
+  return [...rows].sort((a,b)=> new Date(b.date)-new Date(a.date));
 }
-function renderLeaderboard(partId, currentName, currentGroup){
+function saveAttempt(row){
+  const partId = row.partId;
+  const rows = getAttempts(partId);
+  rows.push(row);
+  setAttempts(partId, rows);
+}
+function attemptLabel(a){
+  return `${a.name}${a.group ? " · " + a.group : ""} · ${new Date(a.date).toLocaleString("az-AZ")}`;
+}
+function studentKeyFromAttempt(a){
+  return (a.name + "|" + (a.group || "")).toLowerCase().trim();
+}
+function findPreviousAttempt(current){
+  const rows = sortDate(getAttempts(current.partId))
+    .filter(a => a.attemptId !== current.attemptId && studentKeyFromAttempt(a) === studentKeyFromAttempt(current) && new Date(a.date) < new Date(current.date));
+  return rows[0] || null;
+}
+function renderLeaderboard(partId, currentAttemptId=""){
   const box = document.getElementById("leaderboard");
-  const rows = sortLB(getLB(partId));
+  const rows = sortScore(getAttempts(partId));
   if(!rows.length){ box.innerHTML=""; return; }
-  const key = (currentName+"|"+currentGroup).toLowerCase().trim();
-  const myIndex = rows.findIndex(r => (r.name+"|"+r.group).toLowerCase().trim() === key);
+  const myIndex = rows.findIndex(r => r.attemptId === currentAttemptId);
   box.innerHTML = `
-    <h3>Bu hissə üzrə reytinq</h3>
-    <p class="note">Reytinq düzgün cavab sayına görə, bərabərlikdə isə daha tez bitirmə vaxtına görə sıralanır. Statik GitHub Pages olduğu üçün nəticələr həmin brauzerin yaddaşında saxlanılır.</p>
-    ${myIndex>=0 ? `<p><b>Sizin yeriniz:</b> ${myIndex+1} / ${rows.length}</p>` : ""}
+    <h3>Bu hissə üzrə scoreboard</h3>
+    <p class="note">Scoreboard bütün cəhdləri saxlayır. Eyni şəxs təkrar daxil olsa belə, əvvəlki nəticə silinmir; hər giriş ayrıca cəhd kimi qalır.</p>
+    ${myIndex>=0 ? `<p><b>Bu cəhd üzrə yer:</b> ${myIndex+1} / ${rows.length}</p>` : ""}
     <table>
-      <thead><tr><th>Yer</th><th>Tələbə</th><th>Düzgün</th><th>Səhv</th><th>Cavabsız</th><th>Vaxt</th><th>Tarix</th></tr></thead>
+      <thead><tr><th>Yer</th><th>Tələbə</th><th>Düzgün</th><th>Səhv</th><th>Cavabsız</th><th>Vaxt</th><th>Tarix</th><th>Arxiv</th></tr></thead>
       <tbody>
-      ${rows.slice(0,50).map((r,i)=>{
-        const mine = ((r.name+"|"+r.group).toLowerCase().trim() === key);
+      ${rows.map((r,i)=>{
+        const mine = r.attemptId === currentAttemptId;
         return `<tr class="${mine ? "mine" : ""}">
           <td>${i+1}</td>
           <td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.group||"")}</span></td>
@@ -411,10 +539,139 @@ function renderLeaderboard(partId, currentName, currentGroup){
           <td>${r.blank}</td>
           <td>${fmt(r.spent)}</td>
           <td>${new Date(r.date).toLocaleString("az-AZ")}</td>
+          <td><button class="smallbtn blue" onclick="showAttemptDetail('${partId}','${r.attemptId}')">Səhvlər</button></td>
         </tr>`;
       }).join("")}
       </tbody>
     </table>`;
+}
+let selectedArchivePart = "part1";
+function renderArchiveTabs(){
+  const tabs = document.getElementById("archiveTabs");
+  if(!tabs) return;
+  tabs.innerHTML = DATA.parts.map(p => `<button class="tabbtn ${p.id===selectedArchivePart?'active':''}" onclick="selectArchivePart('${p.id}')">${esc(p.title)} · ${esc(p.range)}</button>`).join("");
+}
+function selectArchivePart(partId){
+  selectedArchivePart = partId;
+  renderArchiveDashboard();
+}
+function renderArchiveDashboard(){
+  renderArchiveTabs();
+  const box = document.getElementById("archiveContent");
+  const detail = document.getElementById("attemptDetail");
+  if(detail) detail.innerHTML = "";
+  if(!box) return;
+  const part = DATA.parts.find(p=>p.id===selectedArchivePart) || DATA.parts[0];
+  const rowsDate = sortDate(getAttempts(part.id));
+  const rowsScore = sortScore(getAttempts(part.id));
+  if(!rowsDate.length){
+    box.innerHTML = `<p class="note"><b>${esc(part.title)} (${esc(part.range)})</b> üzrə hələ arxiv nəticəsi yoxdur. Bu hissədə imtahan bitirildikdən sonra nəticələr burada görünəcək.</p>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="archive-grid">
+      <div>
+        <h3>${esc(part.title)} scoreboardu</h3>
+        <p class="note">Düzgün cavab sayına görə sıralanır, bərabərlikdə daha tez bitirən yuxarıda görünür.</p>
+        <table class="archive-table">
+          <thead><tr><th>Yer</th><th>Tələbə</th><th>Düzgün</th><th>Səhv</th><th>Cavabsız</th><th>Vaxt</th><th>Tarix</th><th>Bax</th></tr></thead>
+          <tbody>
+          ${rowsScore.map((r,i)=>`<tr>
+            <td>${i+1}</td>
+            <td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.group||"")}</span></td>
+            <td><b>${r.correct}/${r.total}</b></td>
+            <td>${r.wrong}</td>
+            <td>${r.blank}</td>
+            <td>${fmt(r.spent)}</td>
+            <td>${new Date(r.date).toLocaleString("az-AZ")}</td>
+            <td><button class="smallbtn blue" onclick="showAttemptDetail('${part.id}','${r.attemptId}')">Səhvlər</button></td>
+          </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+      <div>
+        <h3>${esc(part.title)} imtahan arxivi</h3>
+        <p class="note">Son giriş-çıxışlar tarixə görə göstərilir. Hər cəhdin səhvlərinə baxmaq və həmin şəxsin əvvəlki cəhdi ilə müqayisə etmək olar.</p>
+        <table class="archive-table">
+          <thead><tr><th>#</th><th>Tələbə</th><th>Nəticə</th><th>Tarix</th><th>Əməliyyat</th></tr></thead>
+          <tbody>
+          ${rowsDate.map((r,i)=>`<tr>
+            <td>${i+1}</td>
+            <td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.group||"")}</span></td>
+            <td>${r.correct}/${r.total} düzgün<br><span class="sub">Səhv: ${r.wrong}, Cavabsız: ${r.blank}, Vaxt: ${fmt(r.spent)}</span></td>
+            <td>${new Date(r.date).toLocaleString("az-AZ")}</td>
+            <td>
+              <button class="smallbtn blue" onclick="showAttemptDetail('${part.id}','${r.attemptId}')">Səhvlərə bax</button>
+              <button class="smallbtn" onclick="compareAttemptWithPrevious('${part.id}','${r.attemptId}')">Müqayisə et</button>
+            </td>
+          </tr>`).join("")}
+          </tbody>
+        </table>
+      </div>
+    </div>`;
+}
+function showAttemptDetail(partId, attemptId){
+  const attempt = getAttempts(partId).find(a=>a.attemptId===attemptId);
+  const box = document.getElementById("attemptDetail") || document.getElementById("review");
+  if(!attempt || !box) return;
+  const errors = attempt.errors || [];
+  box.innerHTML = `
+    <div class="card">
+      <h3>Arxiv: ${esc(attemptLabel(attempt))}</h3>
+      <p><b>${esc(attempt.partTitle)}</b> (${esc(attempt.partRange)}) · Düzgün: <b>${attempt.correct}/${attempt.total}</b> · Səhv: ${attempt.wrong} · Cavabsız: ${attempt.blank} · Vaxt: ${fmt(attempt.spent)}</p>
+      <button class="smallbtn" onclick="compareAttemptWithPrevious('${partId}','${attemptId}')">Bu cəhdi əvvəlki cəhdlə müqayisə et</button>
+      <div class="err-list">
+        ${errors.length ? errors.map(e=>`<div class="err-card">
+          <b>Baza No: ${e.qid} · <span class="${e.status==='blank'?'status-blank':'status-wrong'}">${e.status==='blank'?'Cavabsız':'Səhv'}</span></b>
+          <p>${esc(e.question)}</p>
+          <p>Seçilən: ${esc(e.chosen || "Cavabsız")}</p>
+          <p>Düzgün cavab: <span class="correct">${esc(e.correctAnswer)}</span></p>
+        </div>`).join("") : `<p class="correct">Bu cəhddə səhv və cavabsız sual yoxdur.</p>`}
+      </div>
+    </div>`;
+  box.scrollIntoView({behavior:"smooth",block:"start"});
+}
+function compareAttemptWithPrevious(partId, attemptId){
+  const current = getAttempts(partId).find(a=>a.attemptId===attemptId);
+  const box = document.getElementById("attemptDetail") || document.getElementById("review");
+  if(!current || !box) return;
+  const prev = findPreviousAttempt(current);
+  if(!prev){
+    box.innerHTML = `<div class="card"><h3>Müqayisə</h3><p class="note">${esc(attemptLabel(current))} üçün eyni ad və qrup üzrə əvvəlki cəhd tapılmadı.</p></div>`;
+    box.scrollIntoView({behavior:"smooth",block:"start"});
+    return;
+  }
+  const prevIds = new Set((prev.errors||[]).map(e=>e.qid));
+  const curIds = new Set((current.errors||[]).map(e=>e.qid));
+  const repeated = [...curIds].filter(id=>prevIds.has(id));
+  const fixed = [...prevIds].filter(id=>!curIds.has(id));
+  const newly = [...curIds].filter(id=>!prevIds.has(id));
+  const currentErrMap = Object.fromEntries((current.errors||[]).map(e=>[e.qid,e]));
+  const prevErrMap = Object.fromEntries((prev.errors||[]).map(e=>[e.qid,e]));
+  function listCards(ids, cls, label, map){
+    return ids.length ? ids.map(id=>{
+      const e = map[id] || currentErrMap[id] || prevErrMap[id];
+      return `<div class="err-card"><b>Baza No: ${id} · <span class="${cls}">${label}</span></b><p>${esc(e.question)}</p><p>Düzgün cavab: <span class="correct">${esc(e.correctAnswer)}</span></p></div>`;
+    }).join("") : `<p class="note">Yoxdur.</p>`;
+  }
+  box.innerHTML = `
+    <div class="card">
+      <h3>Cəhdlərin müqayisəsi</h3>
+      <p><b>Əvvəlki:</b> ${esc(attemptLabel(prev))} · ${prev.correct}/${prev.total} düzgün</p>
+      <p><b>Sonrakı:</b> ${esc(attemptLabel(current))} · ${current.correct}/${current.total} düzgün</p>
+      <div class="compare-grid">
+        <div class="compare-box"><b>Təkrar səhvlər</b><div class="status-repeat">${repeated.length} sual</div></div>
+        <div class="compare-box"><b>Düzələn səhvlər</b><div class="status-fixed">${fixed.length} sual</div></div>
+        <div class="compare-box"><b>Yeni səhvlər</b><div class="status-new">${newly.length} sual</div></div>
+      </div>
+      <h4>Təkrar səhvlər</h4>
+      ${listCards(repeated,'status-repeat','Təkrar səhv',currentErrMap)}
+      <h4>Düzələn səhvlər</h4>
+      ${listCards(fixed,'status-fixed','Bu cəhddə düzəlib',prevErrMap)}
+      <h4>Yeni səhvlər</h4>
+      ${listCards(newly,'status-new','Yeni səhv',currentErrMap)}
+    </div>`;
+  box.scrollIntoView({behavior:"smooth",block:"start"});
 }
 function show(view){
   document.getElementById("dashboard").classList.add("hidden");
@@ -515,24 +772,35 @@ function finishExam(confirmFirst=true){
     const rightIndex = q.opts.findIndex(o => o.correct);
     if(chosen === undefined){
       blank++;
-      review.push({i:i+1, q, chosen:null, right:rightIndex});
+      review.push({i:i+1, q, chosen:null, right:rightIndex, status:"blank"});
     } else if(q.opts[chosen].correct){
       correct++;
     } else {
       wrong++;
-      review.push({i:i+1, q, chosen, right:rightIndex});
+      review.push({i:i+1, q, chosen, right:rightIndex, status:"wrong"});
     }
   });
   const spent = Math.floor((Date.now() - startTime) / 1000);
-  saveLB({
+  const attemptId = "att_" + Date.now() + "_" + Math.random().toString(36).slice(2,8);
+  const errors = review.map(r => ({
+    qid: r.q.id,
+    status: r.status,
+    question: r.q.q,
+    chosen: r.chosen === null ? "" : r.q.opts[r.chosen].text,
+    correctAnswer: r.q.opts[r.right].text
+  }));
+  const attemptRow = {
+    attemptId,
     partId: activePart.id,
     partTitle: activePart.title,
     partRange: activePart.range,
     name: student.name,
     group: student.group || "",
     correct, wrong, blank, total: order.length, spent,
-    date: new Date().toISOString()
-  });
+    date: new Date().toISOString(),
+    errors
+  };
+  saveAttempt(attemptRow);
   show("resultView");
   document.getElementById("resultText").innerHTML = `
     <p><b>${esc(student.name)}</b> · ${esc(activePart.title)} (${esc(activePart.range)})</p>
@@ -542,7 +810,8 @@ function finishExam(confirmFirst=true){
       <div class="kpi"><b>${blank}</b><span>Cavabsız</span></div>
       <div class="kpi"><b>${fmt(spent)}</b><span>Sərf olunan vaxt</span></div>
     </div>`;
-  renderLeaderboard(activePart.id, student.name, student.group || "");
+  renderLeaderboard(activePart.id, attemptId);
+  renderArchiveDashboard();
   const reviewBox = document.getElementById("review");
   reviewBox.innerHTML = review.map(r => {
     const chosenText = r.chosen === null ? "Cavabsız" : r.q.opts[r.chosen].text;
@@ -570,6 +839,8 @@ document.getElementById("backToDashboard").onclick = () => {
   show("dashboard");
 };
 renderPartCards();
+renderArchiveDashboard();
+document.getElementById("refreshArchiveBtn").onclick = renderArchiveDashboard;
 document.getElementById("timer").textContent = fmt(DURATION);
 </script>
 </body>

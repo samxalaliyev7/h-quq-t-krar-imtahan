@@ -19,3 +19,10 @@ Cavab açarı:
 Yoxlama:
 - 300 sual gözlənilir.
 - Faktiki oxunan sual sayı: 300
+
+
+## Dashboard arxiv yeniləməsi
+
+Scoreboard əvvəlki kimi yalnız ən yaxşı nəticəni saxlamır. İndi hər hissə üzrə bütün imtahan cəhdləri ayrı-ayrı arxivləşdirilir.
+Hər cəhddə səhv və cavabsız suallar sual nömrəsi, sual mətni, seçilən cavab və düzgün cavabla birlikdə saxlanılır.
+Eyni istifadəçinin əvvəlki cəhdi ilə növbəti cəhdi müqayisə edilə bilir.

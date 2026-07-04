@@ -36,3 +36,16 @@ ZIP-in içindəki faylları repository-yə yükləyin:
 - README.md
 - DEPLOY_GITHUB_PAGES.md
 - IMPORT_REPORT.md
+
+
+## Yenilənmə: dashboard scoreboard və imtahan arxivi
+
+- Dashboardda hər hissə üçün ayrıca scoreboard əlavə edildi.
+- I, II və III hissə üzrə arxiv ayrı saxlanılır.
+- Eyni şəxs təkrar daxil olsa belə, əvvəlki cəhd silinmir.
+- Hər cəhd ayrıca saxlanılır.
+- İstifadəçilər bütün cəhdlərin səhv və cavabsız suallarına baxa bilir.
+- Eyni ad və qrup üzrə əvvəlki cəhdlə sonrakı cəhd müqayisə olunur.
+- Müqayisədə təkrar səhvlər, düzələn səhvlər və yeni səhvlər göstərilir.
+
+Qeyd: GitHub Pages statik sayt olduğu üçün arxiv və scoreboard həmin brauzerin localStorage yaddaşında saxlanılır.
