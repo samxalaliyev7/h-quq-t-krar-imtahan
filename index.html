@@ -1,0 +1,576 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Biznes hüququ - 3 hissəli imtahan sistemi</title>
+<script src="questions-data.js"></script>
+<style>
+:root{
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --text:#0f172a;
+  --muted:#64748b;
+  --blue:#2563eb;
+  --blue2:#eff6ff;
+  --green:#16a34a;
+  --red:#dc2626;
+  --yellow:#fbbf24;
+  --border:#dbe4f0;
+  --shadow:0 10px 30px rgba(15,23,42,.07);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:linear-gradient(180deg,#f8fbff,#eef4fb);
+  color:var(--text);
+  font-family:"Segoe UI","Noto Sans",Arial,sans-serif;
+}
+header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:rgba(255,255,255,.94);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  padding:14px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:16px;
+}
+h1{font-size:22px;margin:0}
+h2{margin:0 0 10px}
+.sub{color:var(--muted);font-size:14px;line-height:1.45}
+.timer{
+  background:#111827;
+  color:#fff;
+  border-radius:16px;
+  padding:12px 18px;
+  font-size:23px;
+  font-weight:900;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  letter-spacing:.02em;
+}
+.hourglass{display:inline-block;animation:spin 2.2s linear infinite}
+@keyframes spin{0%,45%{transform:rotate(0)}50%,95%{transform:rotate(180deg)}100%{transform:rotate(360deg)}}
+.container{max-width:1220px;margin:22px auto;padding:0 15px}
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:20px;
+  box-shadow:var(--shadow);
+  padding:20px;
+}
+.dashboard-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+  margin-top:18px;
+}
+.part-card{
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  background:linear-gradient(135deg,#fff,#f8fbff);
+  min-height:210px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
+}
+.part-title{font-size:23px;font-weight:900;margin-bottom:4px}
+.badge{
+  display:inline-flex;
+  width:max-content;
+  border-radius:999px;
+  padding:7px 11px;
+  background:var(--blue2);
+  color:#1d4ed8;
+  font-weight:900;
+  font-size:13px;
+  margin:8px 0;
+}
+.form-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:14px;
+  margin:14px 0 4px;
+}
+label{font-weight:800;font-size:14px;display:block;margin-bottom:7px}
+input{
+  width:100%;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:13px 14px;
+  font-size:15px;
+  outline:none;
+}
+input:focus{border-color:#93c5fd;box-shadow:0 0 0 3px #dbeafe}
+.btn{
+  border:0;
+  border-radius:14px;
+  padding:13px 16px;
+  background:var(--blue);
+  color:white;
+  font-weight:900;
+  font-size:15px;
+  cursor:pointer;
+}
+.btn:hover{filter:brightness(.96)}
+.btn.green{background:var(--green)}
+.btn.red{background:var(--red)}
+.btn.ghost{background:#fff;color:#111827;border:1px solid var(--border)}
+.exam-layout{
+  display:grid;
+  grid-template-columns:1fr 310px;
+  gap:16px;
+}
+.topline{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:14px;
+}
+.pill{
+  display:inline-flex;
+  border-radius:999px;
+  padding:8px 12px;
+  background:var(--blue2);
+  color:#1d4ed8;
+  font-weight:900;
+}
+.question{
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  background:#fff;
+  font-size:20px;
+  line-height:1.55;
+  margin-bottom:14px;
+  white-space:pre-wrap;
+}
+.options{display:grid;gap:12px}
+.option{
+  border:2px solid var(--border);
+  background:#fff;
+  border-radius:16px;
+  padding:15px 17px;
+  display:flex;
+  gap:12px;
+  align-items:flex-start;
+  min-height:58px;
+  font-size:17px;
+  line-height:1.45;
+  cursor:pointer;
+}
+.option:hover{border-color:#93c5fd;background:#eff6ff}
+.option.selected{border-color:#2563eb;background:#eff6ff}
+.radio{
+  flex:0 0 auto;
+  width:22px;
+  height:22px;
+  border:2px solid #94a3b8;
+  border-radius:50%;
+  margin-top:1px;
+}
+.option.selected .radio{border:7px solid #2563eb}
+.bottom{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:center;
+  margin-top:18px;
+}
+.nav{
+  position:sticky;
+  top:92px;
+  max-height:calc(100vh - 112px);
+  overflow:auto;
+}
+.navgrid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+.navbtn{
+  border:1px solid var(--border);
+  border-radius:10px;
+  background:#fff;
+  height:38px;
+  font-weight:900;
+  cursor:pointer;
+}
+.navbtn.done{background:var(--blue);color:white}
+.navbtn.seen{background:var(--yellow);color:#111827}
+.navbtn.current{outline:3px solid #93c5fd}
+.legend{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 14px}
+.legend span{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted)}
+.dot{width:14px;height:14px;border-radius:4px;display:inline-block;border:1px solid var(--border)}
+.dot.blue{background:var(--blue)}.dot.yellow{background:var(--yellow)}.dot.white{background:#fff}
+.result-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:12px;
+  margin:14px 0;
+}
+.kpi{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:14px;
+  background:#f8fafc;
+}
+.kpi b{display:block;font-size:24px;margin-bottom:4px}
+.reviewitem{
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:15px;
+  margin:12px 0;
+  background:#fff;
+}
+.correct{color:var(--green);font-weight:900}
+.wrong{color:var(--red);font-weight:900}
+.leaderboard table{
+  width:100%;
+  border-collapse:collapse;
+  border:1px solid var(--border);
+  border-radius:14px;
+  overflow:hidden;
+  background:#fff;
+}
+.leaderboard th,.leaderboard td{
+  border-bottom:1px solid var(--border);
+  padding:10px;
+  text-align:left;
+  font-size:14px;
+}
+.leaderboard th{background:#f8fafc;color:#334155}
+.leaderboard tr.mine{background:#eff6ff}
+.note{font-size:13px;color:var(--muted);line-height:1.45}
+.hidden{display:none!important}
+@media(max-width:900px){
+  header{flex-direction:column;align-items:stretch}
+  .dashboard-grid,.exam-layout,.form-row,.result-grid{grid-template-columns:1fr}
+  .nav{position:static;max-height:none}
+  .question{font-size:18px}
+  .option{font-size:16px}
+  .timer{justify-content:center}
+}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Biznes hüququ</h1>
+    <div class="sub">3 hissəli özünü yoxlama sistemi · hər hissə 100 sual · 90 dəqiqə</div>
+  </div>
+  <div class="timer"><span class="hourglass">⌛</span><span id="timer">90:00</span></div>
+</header>
+
+<main class="container">
+  <section id="dashboard" class="card">
+    <h2>İmtahan dashboardu</h2>
+    <p class="sub">Aşağıdan istədiyin hissəni seç. Hər hissədə həmin aralığa aid 100 sualın hamısı düşür. Sualların sırası və cavab variantları hər girişdə qarışdırılır.</p>
+
+    <div class="form-row">
+      <div>
+        <label for="studentName">Ad, soyad</label>
+        <input id="studentName" placeholder="məsələn: Humay Əliyeva">
+      </div>
+      <div>
+        <label for="studentGroup">Qrup / qeyd</label>
+        <input id="studentGroup" placeholder="istəyə bağlı">
+      </div>
+    </div>
+
+    <div class="dashboard-grid" id="partCards"></div>
+  </section>
+
+  <section id="examView" class="exam-layout hidden">
+    <main class="card">
+      <div class="topline">
+        <div>
+          <span class="pill" id="qtitle">Sual 1 / 100</span>
+          <div class="sub" id="examMeta"></div>
+          <div class="sub" id="stat">Cavablanıb: 0 / 100 · Cavabsız keçilən: 0</div>
+        </div>
+        <button class="btn red" id="finishBtn">İmtahanı bitir</button>
+      </div>
+      <div class="question" id="qtext"></div>
+      <div class="options" id="options"></div>
+      <div class="bottom">
+        <button class="btn ghost" id="prevBtn">Əvvəlki</button>
+        <button class="btn ghost" id="dashBtn">Dashboard</button>
+        <button class="btn" id="nextBtn">Növbəti</button>
+      </div>
+    </main>
+    <aside class="card nav">
+      <h2>Sual nömrələri</h2>
+      <div class="legend">
+        <span><i class="dot blue"></i> Cavablanıb</span>
+        <span><i class="dot yellow"></i> Baxılıb, cavabsız</span>
+        <span><i class="dot white"></i> Açılmayıb</span>
+      </div>
+      <div class="navgrid" id="navgrid"></div>
+    </aside>
+  </section>
+
+  <section id="resultView" class="card hidden">
+    <h2>Nəticə</h2>
+    <div id="resultText"></div>
+    <div id="leaderboard" class="leaderboard"></div>
+    <h3>Səhv və cavabsız suallar</h3>
+    <div id="review"></div>
+    <button class="btn ghost" id="backToDashboard">Dashboarda qayıt</button>
+  </section>
+</main>
+
+<script>
+const DATA = window.EXAM_DATA;
+const DURATION = DATA.durationMinutes * 60;
+let activePart = null;
+let order = [];
+let answers = {};
+let seen = {};
+let idx = 0;
+let remain = DURATION;
+let timerHandle = null;
+let startTime = 0;
+let student = {name:"", group:""};
+
+function esc(s){
+  return String(s ?? "").replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+  })[m]);
+}
+function shuffle(a){
+  a=[...a];
+  for(let i=a.length-1;i>0;i--){
+    const j=Math.floor(Math.random()*(i+1));
+    [a[i],a[j]]=[a[j],a[i]];
+  }
+  return a;
+}
+function fmt(seconds){
+  seconds=Math.max(0,seconds);
+  const m=Math.floor(seconds/60), s=seconds%60;
+  return String(m).padStart(2,"0")+":"+String(s).padStart(2,"0");
+}
+function partQuestions(part){
+  return DATA.questions.filter(q => q.id >= part.start && q.id <= part.end);
+}
+function leaderboardKey(partId){
+  return "biznes_huququ_3_part_" + partId + "_leaderboard_v1";
+}
+function getLB(partId){
+  try{return JSON.parse(localStorage.getItem(leaderboardKey(partId)) || "[]")}catch(e){return []}
+}
+function setLB(partId, rows){
+  localStorage.setItem(leaderboardKey(partId), JSON.stringify(rows));
+}
+function sortLB(rows){
+  return [...rows].sort((a,b)=> b.correct-a.correct || a.spent-b.spent || new Date(a.date)-new Date(b.date));
+}
+function saveLB(row){
+  const partId = row.partId;
+  let rows = getLB(partId);
+  const key = (row.name+"|"+row.group).toLowerCase().trim();
+  const i = rows.findIndex(r => (r.name+"|"+r.group).toLowerCase().trim() === key);
+  if(i >= 0){
+    const old = rows[i];
+    if(row.correct > old.correct || (row.correct === old.correct && row.spent < old.spent)){
+      rows[i] = row;
+    }
+  } else {
+    rows.push(row);
+  }
+  setLB(partId, sortLB(rows));
+}
+function renderLeaderboard(partId, currentName, currentGroup){
+  const box = document.getElementById("leaderboard");
+  const rows = sortLB(getLB(partId));
+  if(!rows.length){ box.innerHTML=""; return; }
+  const key = (currentName+"|"+currentGroup).toLowerCase().trim();
+  const myIndex = rows.findIndex(r => (r.name+"|"+r.group).toLowerCase().trim() === key);
+  box.innerHTML = `
+    <h3>Bu hissə üzrə reytinq</h3>
+    <p class="note">Reytinq düzgün cavab sayına görə, bərabərlikdə isə daha tez bitirmə vaxtına görə sıralanır. Statik GitHub Pages olduğu üçün nəticələr həmin brauzerin yaddaşında saxlanılır.</p>
+    ${myIndex>=0 ? `<p><b>Sizin yeriniz:</b> ${myIndex+1} / ${rows.length}</p>` : ""}
+    <table>
+      <thead><tr><th>Yer</th><th>Tələbə</th><th>Düzgün</th><th>Səhv</th><th>Cavabsız</th><th>Vaxt</th><th>Tarix</th></tr></thead>
+      <tbody>
+      ${rows.slice(0,50).map((r,i)=>{
+        const mine = ((r.name+"|"+r.group).toLowerCase().trim() === key);
+        return `<tr class="${mine ? "mine" : ""}">
+          <td>${i+1}</td>
+          <td><b>${esc(r.name)}</b><br><span class="sub">${esc(r.group||"")}</span></td>
+          <td><b>${r.correct}/${r.total}</b></td>
+          <td>${r.wrong}</td>
+          <td>${r.blank}</td>
+          <td>${fmt(r.spent)}</td>
+          <td>${new Date(r.date).toLocaleString("az-AZ")}</td>
+        </tr>`;
+      }).join("")}
+      </tbody>
+    </table>`;
+}
+function show(view){
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("examView").classList.add("hidden");
+  document.getElementById("resultView").classList.add("hidden");
+  document.getElementById(view).classList.remove("hidden");
+}
+function renderPartCards(){
+  const box = document.getElementById("partCards");
+  box.innerHTML = DATA.parts.map(p => {
+    const count = partQuestions(p).length;
+    return `<div class="part-card">
+      <div>
+        <div class="part-title">${esc(p.title)}</div>
+        <div class="sub">${esc(p.range)}-cü suallar</div>
+        <span class="badge">${count} sual · 90 dəqiqə</span>
+        <p class="sub">Bu hissəyə daxil olduqda yalnız ${esc(p.range)} aralığındakı suallar qarışıq sırada təqdim olunur.</p>
+      </div>
+      <button class="btn green" onclick="startPart('${p.id}')">Bu hissəyə başla</button>
+    </div>`;
+  }).join("");
+}
+function startPart(partId){
+  const name = document.getElementById("studentName").value.trim();
+  const group = document.getElementById("studentGroup").value.trim();
+  if(!name){
+    alert("Zəhmət olmasa ad, soyad yazın.");
+    return;
+  }
+  student = {name, group};
+  activePart = DATA.parts.find(p => p.id === partId);
+  const source = partQuestions(activePart);
+  order = shuffle(source).map(q => ({
+    ...q,
+    opts: shuffle(q.options.map((text, originalIndex) => ({text, correct: originalIndex === q.correct})))
+  }));
+  answers = {};
+  seen = {};
+  idx = 0;
+  remain = DURATION;
+  startTime = Date.now();
+  clearInterval(timerHandle);
+  document.getElementById("timer").textContent = fmt(remain);
+  timerHandle = setInterval(() => {
+    remain--;
+    document.getElementById("timer").textContent = fmt(remain);
+    if(remain <= 0) finishExam(false);
+  }, 1000);
+  show("examView");
+  renderQuestion();
+}
+function renderQuestion(){
+  const q = order[idx];
+  seen[q.id] = true;
+  document.getElementById("qtitle").textContent = `Sual ${idx+1} / ${order.length} · Baza No: ${q.id}`;
+  document.getElementById("examMeta").textContent = `${DATA.subject} · ${activePart.title} (${activePart.range}) · ${student.name}`;
+  document.getElementById("qtext").textContent = q.q;
+  const opts = document.getElementById("options");
+  opts.innerHTML = "";
+  q.opts.forEach((o,i)=>{
+    const div = document.createElement("div");
+    div.className = "option" + (answers[q.id] === i ? " selected" : "");
+    div.innerHTML = `<span class="radio"></span><span>${esc(o.text)}</span>`;
+    div.onclick = () => {
+      answers[q.id] = i;
+      renderQuestion();
+    };
+    opts.appendChild(div);
+  });
+  renderNav();
+  renderStat();
+}
+function renderStat(){
+  const done = Object.keys(answers).length;
+  const skipped = Object.keys(seen).filter(id => answers[id] === undefined).length;
+  document.getElementById("stat").textContent = `Cavablanıb: ${done} / ${order.length} · Baxılıb, cavabsız: ${skipped}`;
+}
+function renderNav(){
+  const nav = document.getElementById("navgrid");
+  nav.innerHTML = "";
+  order.forEach((q,i)=>{
+    const b = document.createElement("button");
+    b.className = "navbtn"
+      + (answers[q.id] !== undefined ? " done" : seen[q.id] ? " seen" : "")
+      + (i === idx ? " current" : "");
+    b.textContent = i+1;
+    b.onclick = () => {idx = i; renderQuestion();};
+    nav.appendChild(b);
+  });
+}
+function finishExam(confirmFirst=true){
+  if(confirmFirst && !confirm("İmtahanı bitirmək istəyirsiniz?")) return;
+  clearInterval(timerHandle);
+  let correct = 0, wrong = 0, blank = 0;
+  const review = [];
+  order.forEach((q,i)=>{
+    const chosen = answers[q.id];
+    const rightIndex = q.opts.findIndex(o => o.correct);
+    if(chosen === undefined){
+      blank++;
+      review.push({i:i+1, q, chosen:null, right:rightIndex});
+    } else if(q.opts[chosen].correct){
+      correct++;
+    } else {
+      wrong++;
+      review.push({i:i+1, q, chosen, right:rightIndex});
+    }
+  });
+  const spent = Math.floor((Date.now() - startTime) / 1000);
+  saveLB({
+    partId: activePart.id,
+    partTitle: activePart.title,
+    partRange: activePart.range,
+    name: student.name,
+    group: student.group || "",
+    correct, wrong, blank, total: order.length, spent,
+    date: new Date().toISOString()
+  });
+  show("resultView");
+  document.getElementById("resultText").innerHTML = `
+    <p><b>${esc(student.name)}</b> · ${esc(activePart.title)} (${esc(activePart.range)})</p>
+    <div class="result-grid">
+      <div class="kpi"><b>${correct}</b><span>Düzgün</span></div>
+      <div class="kpi"><b>${wrong}</b><span>Səhv</span></div>
+      <div class="kpi"><b>${blank}</b><span>Cavabsız</span></div>
+      <div class="kpi"><b>${fmt(spent)}</b><span>Sərf olunan vaxt</span></div>
+    </div>`;
+  renderLeaderboard(activePart.id, student.name, student.group || "");
+  const reviewBox = document.getElementById("review");
+  reviewBox.innerHTML = review.map(r => {
+    const chosenText = r.chosen === null ? "Cavabsız" : r.q.opts[r.chosen].text;
+    const rightText = r.q.opts[r.right].text;
+    return `<div class="reviewitem">
+      <b>Sual ${r.i} · Baza No: ${r.q.id}</b>
+      <p>${esc(r.q.q)}</p>
+      <p>Seçilən: <span class="${r.chosen === null ? "" : "wrong"}">${esc(chosenText)}</span></p>
+      <p>Düzgün cavab: <span class="correct">${esc(rightText)}</span></p>
+    </div>`;
+  }).join("") || `<p class="correct">Təbriklər! Bu hissədə səhv və cavabsız sual yoxdur.</p>`;
+}
+document.getElementById("finishBtn").onclick = () => finishExam(true);
+document.getElementById("nextBtn").onclick = () => { if(idx < order.length-1){ idx++; renderQuestion(); } };
+document.getElementById("prevBtn").onclick = () => { if(idx > 0){ idx--; renderQuestion(); } };
+document.getElementById("dashBtn").onclick = () => {
+  if(confirm("Dashboarda qayıtsanız, hazırkı imtahan yarımçıq qalacaq. Davam edirsiniz?")){
+    clearInterval(timerHandle);
+    document.getElementById("timer").textContent = fmt(DURATION);
+    show("dashboard");
+  }
+};
+document.getElementById("backToDashboard").onclick = () => {
+  document.getElementById("timer").textContent = fmt(DURATION);
+  show("dashboard");
+};
+renderPartCards();
+document.getElementById("timer").textContent = fmt(DURATION);
+</script>
+</body>
+</html>
